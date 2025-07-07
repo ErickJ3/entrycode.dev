@@ -1,0 +1,20 @@
+{
+	"name": "entrycode.dev",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"build": "turbo run build",
+		"dev": "turbo run dev --parallel",
+		"lint": "turbo run lint",
+		"test": "turbo run test"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"packageManager": "pnpm@10.10.0",
+	"devDependencies": {
+		"@biomejs/biome": "2.0.6",
+		"turbo": "^2.5.4"
+	}
+}
