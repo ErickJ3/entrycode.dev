@@ -1,5 +1,8 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.0.6/schema.json",
+  "files": {
+    "ignoreUnknown": false
+  },
   "vcs": {
     "enabled": false,
     "clientKind": "git",
@@ -75,5 +78,13 @@
       "bracketSpacing": true
     },
     "globals": ["exports"]
+  },
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "on",
+        "recommended": true
+      }
+    }
   }
 }
