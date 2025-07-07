@@ -7,7 +7,8 @@
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",
     "lint": "turbo run lint",
-    "test": "turbo run test"
+    "test": "turbo run test",
+    "prepare": "husky"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +16,10 @@
   "packageManager": "pnpm@10.10.0",
   "devDependencies": {
     "@biomejs/biome": "2.0.6",
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "@commitlint/cz-commitlint": "^19.8.1",
+    "husky": "^9.1.7",
     "turbo": "^2.5.4"
   }
 }
