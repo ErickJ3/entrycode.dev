@@ -32,6 +32,7 @@
 # Testing
 **/coverage/
 **/.nyc_output/
+**/.jest-cache/
 
 # IDEs and editors
 **/.idea/

@@ -1,0 +1,21 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": "src",
+  "testRegex": ".*\\.spec\\.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": "@swc/jest"
+  },
+  "collectCoverageFrom": ["**/*.(t|j)s", "!**/*.spec.(t|j)s"],
+  "coveragePathIgnorePatterns": [
+    "/node_modules/",
+    "<rootDir>/main.ts",
+    "(.+).module.ts"
+  ],
+  "coverageDirectory": "../coverage",
+  "testEnvironment": "node",
+  "moduleNameMapper": {
+    "^~/(.*)$": "<rootDir>/src$1"
+  },
+  "cacheDirectory": "../.jest-cache",
+  "testTimeout": 120000
+}
