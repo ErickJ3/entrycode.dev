@@ -16,6 +16,5 @@
       "outputs": [],
       "dependsOn": ["^build"]
     }
-  },
-  "globalDependencies": ["**/.env.*local"]
+  }
 }
