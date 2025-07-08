@@ -1,8 +1,31 @@
+import { ValidationPipe } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { AppModule } from './app.module'
+import { ConfigService } from './modules/common/config/service/config.service'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
-  await app.listen(process.env.PORT ?? 3333)
+  const configService = app.get(ConfigService)
+
+  if (configService.get('env') === 'development') {
+    const config = new DocumentBuilder()
+      .setTitle(configService.get('app').name)
+      .setDescription(configService.get('app').description)
+      .setVersion(configService.get('app').version)
+      .build()
+
+    const documentFactory = () => SwaggerModule.createDocument(app, config)
+
+    SwaggerModule.setup('docs', app, documentFactory, {
+      jsonDocumentUrl: 'docs/json',
+    })
+  }
+
+  app.useGlobalPipes(new ValidationPipe())
+
+  const port = configService.get('port')
+  await app.listen(port)
 }
+
 bootstrap()
