@@ -47,6 +47,7 @@ RUN adduser -S nestjs -u 1001
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/apps/api/dist ./dist
 COPY --from=builder /app/repositories.toml ./repositories.toml
+COPY --from=builder /app/apps/api/drizzle.config.ts ./drizzle.config.ts
 
 RUN chown -R nestjs:nodejs /app
 USER nestjs
