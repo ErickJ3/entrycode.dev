@@ -9,7 +9,8 @@
   "coveragePathIgnorePatterns": [
     "/node_modules/",
     "<rootDir>/main.ts",
-    "(.+).module.ts"
+    "(.+).module.ts",
+    "(.+).constant.ts"
   ],
   "coverageDirectory": "../coverage",
   "testEnvironment": "node",
