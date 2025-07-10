@@ -3,6 +3,7 @@ import { RepositoriesConfigService } from './repositories.config'
 import * as fs from 'fs'
 import * as path from 'path'
 import * as toml from 'toml'
+import { ConfigService } from './config.service'
 
 jest.mock('fs')
 jest.mock('path')
@@ -14,6 +15,7 @@ const mockToml = toml as jest.Mocked<typeof toml>
 
 describe('RepositoriesConfigService', () => {
   let service: RepositoriesConfigService
+  let _configService: jest.Mocked<ConfigService>
 
   const mockConfigContent = `
     repositories = [
@@ -29,15 +31,29 @@ describe('RepositoriesConfigService', () => {
   beforeEach(async () => {
     jest.clearAllMocks()
 
+    const mockConfigService = {
+      get: jest.fn().mockReturnValue('production'),
+    }
+
     mockPath.join.mockReturnValue('/mock/path/repositories.toml')
+    mockPath.resolve.mockReturnValue('/mock/monorepo/root')
     mockFs.readFileSync.mockReturnValue(mockConfigContent)
     mockToml.parse.mockReturnValue(mockParsedConfig)
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [RepositoriesConfigService],
+      providers: [
+        RepositoriesConfigService,
+        {
+          provide: ConfigService,
+          useValue: mockConfigService,
+        },
+      ],
     }).compile()
 
     service = module.get<RepositoriesConfigService>(RepositoriesConfigService)
+    _configService = module.get<ConfigService>(
+      ConfigService,
+    ) as jest.Mocked<ConfigService>
   })
 
   describe('constructor', () => {
@@ -53,24 +69,77 @@ describe('RepositoriesConfigService', () => {
       expect(mockToml.parse).toHaveBeenCalledWith(mockConfigContent)
     })
 
-    it('should throw error if it fails to load the file', () => {
+    it('should load config from monorepo root in development', async () => {
+      jest.clearAllMocks()
+
+      const mockConfigServiceDev = {
+        get: jest.fn().mockReturnValue('development'),
+      }
+
+      mockPath.resolve.mockReturnValue('/mock/monorepo/root')
+      mockPath.join.mockReturnValue('/mock/monorepo/root/repositories.toml')
+      mockFs.readFileSync.mockReturnValue(mockConfigContent)
+      mockToml.parse.mockReturnValue(mockParsedConfig)
+
+      await Test.createTestingModule({
+        providers: [
+          RepositoriesConfigService,
+          {
+            provide: ConfigService,
+            useValue: mockConfigServiceDev,
+          },
+        ],
+      }).compile()
+
+      expect(mockPath.resolve).toHaveBeenCalledWith(process.cwd(), '../..')
+      expect(mockPath.join).toHaveBeenCalledWith(
+        '/mock/monorepo/root',
+        'repositories.toml',
+      )
+    })
+
+    it('should throw error if it fails to load the file', async () => {
       mockFs.readFileSync.mockImplementation(() => {
         throw new Error('File not found')
       })
 
-      expect(() => {
-        new RepositoriesConfigService()
-      }).toThrow('Failed to load repositories.toml: File not found')
+      const mockConfigServiceError = {
+        get: jest.fn().mockReturnValue('production'),
+      }
+
+      await expect(
+        Test.createTestingModule({
+          providers: [
+            RepositoriesConfigService,
+            {
+              provide: ConfigService,
+              useValue: mockConfigServiceError,
+            },
+          ],
+        }).compile(),
+      ).rejects.toThrow('Failed to load repositories.toml: File not found')
     })
 
-    it('should throw error if TOML parsing fails', () => {
+    it('should throw error if TOML parsing fails', async () => {
       mockToml.parse.mockImplementation(() => {
         throw new Error('Invalid TOML syntax')
       })
 
-      expect(() => {
-        new RepositoriesConfigService()
-      }).toThrow('Failed to load repositories.toml: Invalid TOML syntax')
+      const mockConfigServiceError = {
+        get: jest.fn().mockReturnValue('production'),
+      }
+
+      await expect(
+        Test.createTestingModule({
+          providers: [
+            RepositoriesConfigService,
+            {
+              provide: ConfigService,
+              useValue: mockConfigServiceError,
+            },
+          ],
+        }).compile(),
+      ).rejects.toThrow('Failed to load repositories.toml: Invalid TOML syntax')
     })
   })
 
@@ -84,10 +153,28 @@ describe('RepositoriesConfigService', () => {
       ])
     })
 
-    it('should return empty array if there are no repositories', () => {
-      mockToml.parse.mockReturnValue({ repositories: [] })
-      const serviceWithEmptyConfig = new RepositoriesConfigService()
+    it('should return empty array if there are no repositories', async () => {
+      const emptyConfig = { repositories: [] }
 
+      mockToml.parse.mockReturnValue(emptyConfig)
+
+      const mockConfigServiceEmpty = {
+        get: jest.fn().mockReturnValue('production'),
+      }
+
+      const module: TestingModule = await Test.createTestingModule({
+        providers: [
+          RepositoriesConfigService,
+          {
+            provide: ConfigService,
+            useValue: mockConfigServiceEmpty,
+          },
+        ],
+      }).compile()
+
+      const serviceWithEmptyConfig = module.get<RepositoriesConfigService>(
+        RepositoriesConfigService,
+      )
       const urls = serviceWithEmptyConfig.getAllRepositoryUrls()
 
       expect(urls).toEqual([])
