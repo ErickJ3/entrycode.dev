@@ -54,4 +54,4 @@ USER nestjs
 
 EXPOSE 3000
 
-ENTRYPOINT ["sh", "-c", "npx drizzle-kit push && node dist/main"]
+ENTRYPOINT ["node", "dist/main"]
