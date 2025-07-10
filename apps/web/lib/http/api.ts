@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { LanguageCountResponse, RepositoryListResponse } from './types'
 
-const client = axios.create({ baseURL: 'http://localhost:3333' })
+const client = axios.create({ baseURL: process.env.NEXT_PUBLIC_BACKEND_API })
 
 export const getLanguagesCount = async () => {
   return client
