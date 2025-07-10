@@ -25,6 +25,9 @@ COPY --from=builder /app/out/pnpm-lock.yaml* ./
 RUN pnpm install --frozen-lockfile
 
 COPY --from=builder /app/out/full/ .
+
+ENV NEXT_PUBLIC_BACKEND_API=NEXT_PUBLIC_BACKEND_API
+
 RUN pnpm turbo run build --filter=web
 
 FROM base AS runner
