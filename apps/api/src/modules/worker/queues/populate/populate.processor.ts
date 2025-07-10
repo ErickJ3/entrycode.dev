@@ -68,6 +68,6 @@ export class PopulateProcessor extends WorkerHost {
 
   @OnWorkerEvent('error')
   async onError(job: Job, error: Error) {
-    this.logger.error(`Job ${job.id} has failed with error: ${error.message}`)
+    this.logger.error(`Job ${job.id} has failed with error: ${error}`)
   }
 }

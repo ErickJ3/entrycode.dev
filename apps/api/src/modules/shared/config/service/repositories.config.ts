@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import * as fs from 'fs'
 import * as path from 'path'
 import * as toml from 'toml'
+import { ConfigService } from './config.service'
 
 interface RepositoriesConfig {
   repositories: string[]
@@ -11,13 +12,13 @@ interface RepositoriesConfig {
 export class RepositoriesConfigService {
   private config: RepositoriesConfig
 
-  constructor() {
+  constructor(private readonly configService: ConfigService) {
     this.loadConfig()
   }
 
   private loadConfig() {
     try {
-      const configPath = path.join(process.cwd(), 'repositories.toml')
+      const configPath = this.getConfigPath()
       const configContent = fs.readFileSync(configPath, 'utf8')
       this.config = toml.parse(configContent)
     } catch (error) {
@@ -31,5 +32,16 @@ export class RepositoriesConfigService {
 
   reloadConfig() {
     this.loadConfig()
+  }
+
+  private getConfigPath(): string {
+    const isDev = this.configService.get('env') === 'development'
+
+    if (isDev) {
+      const monorepoRoot = path.resolve(process.cwd(), '../..')
+      return path.join(monorepoRoot, 'repositories.toml')
+    } else {
+      return path.join(process.cwd(), 'repositories.toml')
+    }
   }
 }
