@@ -1,3 +1,4 @@
+import "dotenv/config"
 import { defineConfig } from 'drizzle-kit'
 import { createSharedConfig } from 'src/modules/shared/config/util/shared.config'
 
