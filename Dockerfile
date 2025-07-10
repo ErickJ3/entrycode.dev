@@ -48,11 +48,6 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/.pnpm-store \
 
 RUN turbo run build --filter=api
 
-# RUN cd apps/api && pnpm db:migrate
-
-ENV NODE_ENV=production
-RUN pnpm prune --prod
-
 FROM ${NODE_IMAGE} AS production
 
 WORKDIR /app
@@ -61,12 +56,15 @@ RUN addgroup -g 1001 -S nodejs && \
     adduser -S nestjs -u 1001
 
 COPY --from=builder --chown=nestjs:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=nestjs:nodejs /app/apps/api/dist ./dist
+COPY --from=builder --chown=nestjs:nodejs /app/package.json ./package.json
+COPY --from=builder --chown=nestjs:nodejs /app/pnpm-workspace.yaml ./pnpm-workspace.yaml
+COPY --from=builder --chown=nestjs:nodejs /app/apps/api/dist ./apps/api/dist
+COPY --from=builder --chown=nestjs:nodejs /app/apps/api/package.json ./apps/api/package.json
 COPY --from=builder --chown=nestjs:nodejs /app/repositories.toml ./repositories.toml
-COPY --from=builder --chown=nestjs:nodejs /app/apps/api/drizzle.config.ts ./drizzle.config.ts
+COPY --from=builder --chown=nestjs:nodejs /app/apps/api/drizzle.config.ts ./apps/api/drizzle.config.ts
 
 USER nestjs
 
 EXPOSE 3000
 
-ENTRYPOINT ["node", "dist/main"]
+ENTRYPOINT ["node", "apps/api/dist/main"]
