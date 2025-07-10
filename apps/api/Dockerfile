@@ -20,8 +20,11 @@ RUN pnpm install --frozen-lockfile
 
 COPY --from=builder /app/out/full/ .
 COPY --from=builder /app/repositories.toml ./repositories.toml
+COPY --from=builder /app/apps/api/drizzle.config.ts ./drizzle.config.ts
 
 RUN pnpm turbo run build --filter=api
+
+RUN pnpm --filter=api db:migrate
 
 FROM base AS runner
 WORKDIR /app
