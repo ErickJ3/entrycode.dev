@@ -9,7 +9,6 @@
     "dev": "turbo run dev --parallel",
     "lint": "turbo run lint",
     "test": "turbo run test",
-    "db:migrate": "pnpm --filter api db:migrate",
     "prepare": "husky"
   },
   "keywords": [],
