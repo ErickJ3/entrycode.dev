@@ -20,11 +20,8 @@ RUN pnpm install --frozen-lockfile
 
 COPY --from=builder /app/out/full/ .
 COPY --from=builder /app/repositories.toml ./repositories.toml
-COPY --from=builder /app/apps/api/drizzle.config.ts ./drizzle.config.ts
 
 RUN pnpm turbo run build --filter=api
-
-RUN pnpm --filter=api db:migrate
 
 FROM base AS runner
 WORKDIR /app
@@ -39,4 +36,4 @@ USER nestjs
 EXPOSE 3000
 ENV PORT=3000
 
-CMD ["node", "apps/api/dist/main"]
+CMD ["sh", "-c", "cd apps/api && npx drizzle-kit migrate && cd ../.. && node apps/api/dist/main"]
