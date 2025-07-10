@@ -1,0 +1,35 @@
+services:
+  pgsql:
+    image: postgres:latest
+    container_name: entrycode-pgsql
+    environment:
+      POSTGRES_USER: '${DATABASE_USERNAME}'
+      POSTGRES_PASSWORD: '${DATABASE_PASSWORD}'
+      POSTGRES_DB: '${DATABASE_NAME}'
+      TZ: 'UTC'
+    ports:
+      - '${DATABASE_PORT}:5432'
+    volumes:
+      - ./.docker/postgres_data:/var/lib/postgresql/data
+    networks:
+      - entrycode-net
+
+  redis:
+    image: redis:7.0.1-alpine
+    container_name: entrycode-redis
+    ports:
+      - '${REDIS_PORT}:6379'
+    environment:
+      REDIS_ARGS: '--requirepass ${REDIS_PASSWORD}'
+    volumes:
+      - ./.docker/redis_data:/data
+    healthcheck:
+      test: [ 'CMD', 'redis-cli', '--raw', 'incr', 'ping' ]
+    command: 'redis-server --save 120 1 --loglevel warning'
+    networks:
+      - entrycode-net
+
+networks:
+  entrycode-net:
+    name: entrycode-net
+    driver: bridge

@@ -34,6 +34,9 @@
 **/.nyc_output/
 **/.jest-cache/
 
+**/.docker/postgres_data
+**/.docker/redis_data
+
 # IDEs and editors
 **/.idea/
 **/.project
