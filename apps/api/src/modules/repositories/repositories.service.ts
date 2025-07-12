@@ -25,14 +25,7 @@ export class RepositoriesService {
     const conditions: NonNullable<SQL<unknown>>[] = []
 
     if (search) {
-      const searchCondition = or(
-        ilike(repositoriesTable.language, `%${search}%`),
-        ilike(repositoriesTable.fullName, `%${search}%`),
-      )
-
-      if (searchCondition) {
-        conditions.push(searchCondition)
-      }
+      conditions.push(ilike(repositoriesTable.language, `%${search}%`))
     }
 
     const whereClause = conditions.length > 0 ? and(...conditions) : undefined
