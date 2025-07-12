@@ -1,6 +1,6 @@
 import { db } from '~/database/client'
 import { Injectable } from '@nestjs/common'
-import { count, sql, asc, desc, and, ilike, SQL } from 'drizzle-orm'
+import { count, sql, asc, desc, and, ilike, SQL, eq, or } from 'drizzle-orm'
 import { issuesTable, repositoriesTable } from '~/database/schema'
 
 interface PaginationOptions {
@@ -22,10 +22,17 @@ export class RepositoriesService {
       sortOrder = 'desc',
     } = options
 
-    const conditions: SQL<unknown>[] = []
+    const conditions: NonNullable<SQL<unknown>>[] = []
 
     if (search) {
-      conditions.push(ilike(repositoriesTable.fullName, `%${search}%`))
+      const searchCondition = or(
+        ilike(repositoriesTable.language, `%${search}%`),
+        ilike(repositoriesTable.fullName, `%${search}%`),
+      )
+
+      if (searchCondition) {
+        conditions.push(searchCondition)
+      }
     }
 
     const whereClause = conditions.length > 0 ? and(...conditions) : undefined

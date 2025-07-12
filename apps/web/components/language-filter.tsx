@@ -1,12 +1,15 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
+import { useRouter } from 'next/navigation'
 import { Badge } from '~/components/ui/badge'
 import { getLanguagesCount } from '~/lib/http/api'
+import { queryKeys } from '~/lib/http/query-keys'
 
 export const LanguageFilter = () => {
+  const router = useRouter()
   const { data: repoCounts } = useQuery({
-    queryKey: ['languages-count-repo'],
+    queryKey: [queryKeys.languages.count],
     queryFn: getLanguagesCount,
   })
 
@@ -26,6 +29,7 @@ export const LanguageFilter = () => {
             key={item.language}
             variant="secondary"
             className="px-3 py-1 select-none text-sm font-medium transition-colors cursor-pointer border border-white/10"
+            onClick={() => router.push(`/${item.language.toLowerCase()}`)}
           >
             {item.language} × {item.count}
           </Badge>

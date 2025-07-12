@@ -4,14 +4,15 @@ import { useInfiniteQuery } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
 import { useCallback, useEffect, useRef } from 'react'
 import { getAllRepos } from '~/lib/http/api'
+import { queryKeys } from '~/lib/http/query-keys'
 
-export const RepositoryList = () => {
+export const RepositoryList = ({ search = '' }) => {
   const observerRef = useRef<HTMLDivElement>(null)
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery({
-      queryKey: ['repos'],
-      queryFn: ({ pageParam = 1 }) => getAllRepos(pageParam, 10),
+      queryKey: [queryKeys.languages.all, search],
+      queryFn: ({ pageParam = 1 }) => getAllRepos(pageParam, 10, search),
       getNextPageParam: (lastPage) => {
         const { pagination } = lastPage
         return pagination.hasNextPage ? pagination.page + 1 : undefined
