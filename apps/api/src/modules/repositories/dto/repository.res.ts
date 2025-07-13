@@ -7,7 +7,7 @@ export class RepositoriesResponse {
     description: 'Array of repositories',
     type: [Repository],
   })
-  data: Repository[]
+  items: Repository[]
 
   @ApiProperty({
     description: 'Pagination information',

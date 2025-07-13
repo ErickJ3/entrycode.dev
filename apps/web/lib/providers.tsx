@@ -1,16 +1,21 @@
 'use client'
 
-import { QueryClientProvider } from '@tanstack/react-query'
+import { ThemeProvider } from 'next-themes'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useState } from 'react'
-import { makeQueryClient } from './query-client'
-import { ThemeProvider } from '~/components/theme-provider'
 
 export default function Providers({ children }: { children: React.ReactNode }) {
-  const [queryClient] = useState(() => makeQueryClient())
+  const [queryClient] = useState(() => new QueryClient())
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="dark">
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="dark"
+        disableTransitionOnChange
+      >
+        {children}
+      </ThemeProvider>
+    </QueryClientProvider>
   )
 }
