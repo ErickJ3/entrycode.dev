@@ -9,9 +9,9 @@ import { queryKeys } from '~/lib/http/query-keys'
 export const LanguageFilter = () => {
   const router = useRouter()
   const { data: repoCounts } = useQuery({
-    queryKey: [queryKeys.languages.count],
+    queryKey: queryKeys.languages.count,
     queryFn: getLanguagesCount,
-  })
+  })  
 
   if (!repoCounts) {
     return null

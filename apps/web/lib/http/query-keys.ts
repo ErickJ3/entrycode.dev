@@ -10,4 +10,8 @@ export const queryKeys = {
     all: ['languages'] as const,
     count: ['languages', 'count'] as const,
   },
+  issues: {
+    all: ['issues'] as const,
+    byRepo: (repositoryId: string) => ['issues', 'repo', repositoryId] as const,
+  },
 } as const

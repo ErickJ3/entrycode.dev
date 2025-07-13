@@ -4,11 +4,11 @@ interface LanguageCount {
 }
 
 export interface LanguageCountResponse {
-  data: LanguageCount[]
+  items: LanguageCount[]
   total: number
 }
 
-interface Repository {
+export interface Repository {
   id: string
   name: string
   fullName: string
@@ -37,6 +37,28 @@ interface PaginationInfo {
 }
 
 export interface RepositoryListResponse {
-  data: Repository[]
+  items: Repository[]
   pagination: PaginationInfo
+}
+
+export interface Issue {
+  id: string
+  githubId: number
+  title: string
+  comments: number
+}
+
+export interface Pagination {
+  total: number
+  limit: number
+  offset: number
+  page: number
+  totalPages: number
+  hasNextPage: boolean
+  hasPreviousPage: boolean
+}
+
+export interface IssueListResponse {
+  items: Issue[]
+  pagination: Pagination
 }

@@ -13,7 +13,7 @@ export class LanguagesCountResponse {
     type: [LanguageCountDto],
     description: 'List of languages with their repository counts',
   })
-  data: LanguageCountDto[]
+  items: LanguageCountDto[]
 
   @ApiProperty({ description: 'Total number of different languages' })
   total: number
