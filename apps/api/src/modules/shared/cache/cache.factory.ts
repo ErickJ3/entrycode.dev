@@ -7,11 +7,12 @@ async function useCacheFactory(config: ConfigService) {
     host: config.get('redis').host,
     port: config.get('redis').port,
     password: config.get('redis').password,
-    tls: false,
   }
 
   return new Keyv({
-    store: new KeyvRedis(redisConfig),
+    store: new KeyvRedis(
+      `redis://default:${redisConfig.password}@${redisConfig.host}:${redisConfig.port}`,
+    ),
   })
 }
 

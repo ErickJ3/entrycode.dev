@@ -11,6 +11,7 @@ import { RepositoriesModule } from './modules/repositories/repositories.module'
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    CacheModule,
     BullModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -18,7 +19,6 @@ import { RepositoriesModule } from './modules/repositories/repositories.module'
     }),
     WorkerModule,
     TriggerModule,
-    CacheModule,
     RepositoriesModule,
   ],
 })

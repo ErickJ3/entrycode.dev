@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query } from '@nestjs/common'
+import { Controller, Get, Param, Query, UseInterceptors } from '@nestjs/common'
 import { RepositoriesService } from './repositories.service'
 import { RepositoriesResponse } from './dto/repository.res'
 import { GetRepositoriesDto } from './dto/get-repositories.dto'
@@ -6,9 +6,11 @@ import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { LanguagesCountResponse } from './dto/languages-count.dto'
 import { GetIssuesDto } from './dto/get-issue.dto'
 import { IssuesResponse } from './dto/issue.res'
+import { CacheInterceptor } from '@nestjs/cache-manager'
 
 @ApiTags('Repositories')
 @Controller('repositories')
+@UseInterceptors(CacheInterceptor)
 export class RepositoriesController {
   constructor(private readonly repositoriesService: RepositoriesService) {}
 

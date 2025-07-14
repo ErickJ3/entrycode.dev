@@ -23,7 +23,7 @@ describe('useCacheFactory', () => {
     jest.clearAllMocks()
   })
 
-  it('should create Keyv instance with correct Redis configuration', async () => {
+  it('should create Keyv instance with correct Redis connection string', async () => {
     const mockRedisConfig = {
       host: 'localhost',
       port: 6379,
@@ -35,12 +35,9 @@ describe('useCacheFactory', () => {
     await useCacheFactory(mockConfigService)
 
     expect(mockConfigService.get).toHaveBeenCalledWith('redis')
-    expect(mockKeyvRedis).toHaveBeenCalledWith({
-      host: 'localhost',
-      port: 6379,
-      password: 'test-password',
-      tls: false,
-    })
+    expect(mockKeyvRedis).toHaveBeenCalledWith(
+      'redis://default:test-password@localhost:6379',
+    )
     expect(mockKeyv).toHaveBeenCalledWith({
       store: expect.any(mockKeyvRedis),
     })
@@ -57,19 +54,16 @@ describe('useCacheFactory', () => {
 
     await useCacheFactory(mockConfigService)
 
-    expect(mockKeyvRedis).toHaveBeenCalledWith({
-      host: 'redis-server',
-      port: 6380,
-      password: undefined,
-      tls: false,
-    })
+    expect(mockKeyvRedis).toHaveBeenCalledWith(
+      'redis://default:undefined@redis-server:6380',
+    )
   })
 
-  it('should always set tls to false', async () => {
+  it('should handle redis config with empty password', async () => {
     const mockRedisConfig = {
-      host: 'secure-redis',
+      host: 'redis-server',
       port: 6380,
-      password: 'secure-password',
+      password: '',
     }
 
     mockConfigService.get.mockReturnValue(mockRedisConfig)
@@ -77,9 +71,7 @@ describe('useCacheFactory', () => {
     await useCacheFactory(mockConfigService)
 
     expect(mockKeyvRedis).toHaveBeenCalledWith(
-      expect.objectContaining({
-        tls: false,
-      }),
+      'redis://default:@redis-server:6380',
     )
   })
 
