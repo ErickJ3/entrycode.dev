@@ -23,6 +23,7 @@ export const sharedConfigSchema = z.object({
     password: z.string().optional(),
   }),
   githubToken: z.string(),
+  triggerSecret: z.string(),
 })
 
 export type Environment = z.infer<typeof environmentSchema>
@@ -50,6 +51,7 @@ export const createSharedConfig = (): SharedConfig => {
       password: process.env.REDIS_PASSWORD,
     },
     githubToken: process.env.GITHUB_TOKEN,
+    triggerSecret: process.env.TRIGGER_SECRET,
   }
 
   const result = sharedConfigSchema.safeParse(config)

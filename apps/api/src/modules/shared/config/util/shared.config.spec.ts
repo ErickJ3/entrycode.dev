@@ -75,6 +75,7 @@ describe('SharedConfig', () => {
           fc.integer({ min: 1000, max: 65535 }),
           fc.option(fc.constant(faker.internet.password()), { nil: undefined }),
           fc.constant(faker.internet.password()),
+          fc.constant(faker.string.uuid()),
           (
             env,
             port,
@@ -90,6 +91,7 @@ describe('SharedConfig', () => {
             redisPort,
             redisPassword,
             githubToken,
+            triggerSecret,
           ) => {
             const validConfig = {
               env,
@@ -112,6 +114,7 @@ describe('SharedConfig', () => {
                 password: redisPassword,
               },
               githubToken,
+              triggerSecret,
             }
             expect(() => sharedConfigSchema.parse(validConfig)).not.toThrow()
           },
@@ -146,6 +149,7 @@ describe('SharedConfig', () => {
                 password: faker.internet.password(),
               },
               githubToken: faker.internet.password(),
+              triggerSecret: faker.string.uuid(),
             }
 
             const result = sharedConfigSchema.parse(config)
@@ -173,6 +177,7 @@ describe('SharedConfig', () => {
         fc.integer({ min: 1000, max: 65535 }),
         fc.option(fc.constant(faker.internet.password()), { nil: undefined }),
         fc.constant(faker.internet.password()),
+        fc.constant(faker.string.uuid()),
         (
           nodeEnv,
           port,
@@ -188,6 +193,7 @@ describe('SharedConfig', () => {
           redisPort,
           redisPassword,
           githubToken,
+          triggerSecret,
         ) => {
           process.env.NODE_ENV = nodeEnv
           process.env.PORT = port.toString()
@@ -203,6 +209,7 @@ describe('SharedConfig', () => {
           process.env.REDIS_PORT = redisPort.toString()
           process.env.REDIS_PASSWORD = redisPassword || undefined
           process.env.GITHUB_TOKEN = githubToken
+          process.env.TRIGGER_SECRET = triggerSecret
 
           const config = createSharedConfig()
 
@@ -220,10 +227,93 @@ describe('SharedConfig', () => {
           expect(config.redis.port).toBe(redisPort)
           expect(config.redis.password).toBe(redisPassword)
           expect(config.githubToken).toBe(githubToken)
+          expect(config.triggerSecret).toBe(triggerSecret)
         },
       )
 
       fc.assert(property)
+    })
+
+    it('should create valid config with mock variables', () => {
+      const mockEnvVars = {
+        NODE_ENV: 'development',
+        PORT: '3333',
+        APP_NAME: 'Entrycode',
+        APP_VERSION: '0.0.1',
+        APP_DESCRIPTION:
+          'Entrycode platform API, here you will find all the endpoints needed to interact with the platform',
+        DATABASE_USERNAME: 'entry',
+        DATABASE_PASSWORD: 'code',
+        DATABASE_PORT: '5454',
+        DATABASE_NAME: 'entrycode.dev',
+        DATABASE_HOST: '0.0.0.0',
+        REDIS_HOST: '0.0.0.0',
+        REDIS_PORT: '6060',
+        REDIS_PASSWORD: 'redis-password',
+        GITHUB_TOKEN: 'ghp_token',
+        TRIGGER_SECRET: '7fd4cae3-9c88-4894-9121-115640a2d072',
+      }
+
+      Object.entries(mockEnvVars).forEach(([key, value]) => {
+        process.env[key] = value
+      })
+
+      const config = createSharedConfig()
+
+      expect(config.env).toBe('development')
+      expect(config.port).toBe(3333)
+      expect(config.app.name).toBe('Entrycode')
+      expect(config.app.version).toBe('0.0.1')
+      expect(config.app.description).toBe(
+        'Entrycode platform API, here you will find all the endpoints needed to interact with the platform',
+      )
+      expect(config.database.username).toBe('entry')
+      expect(config.database.password).toBe('code')
+      expect(config.database.port).toBe(5454)
+      expect(config.database.name).toBe('entrycode.dev')
+      expect(config.database.host).toBe('0.0.0.0')
+      expect(config.redis.host).toBe('0.0.0.0')
+      expect(config.redis.port).toBe(6060)
+      expect(config.redis.password).toBe('redis-password')
+      expect(config.githubToken).toBe('ghp_token')
+      expect(config.triggerSecret).toBe('7fd4cae3-9c88-4894-9121-115640a2d072')
+    })
+
+    it('should handle missing optional redis password', () => {
+      const mockEnvVars = {
+        NODE_ENV: 'development',
+        PORT: '3333',
+        APP_NAME: 'Entrycode',
+        APP_VERSION: '0.0.1',
+        APP_DESCRIPTION: 'Entrycode platform API',
+        DATABASE_USERNAME: 'entry',
+        DATABASE_PASSWORD: 'code',
+        DATABASE_PORT: '5454',
+        DATABASE_NAME: 'entrycode.dev',
+        DATABASE_HOST: '0.0.0.0',
+        REDIS_HOST: '0.0.0.0',
+        REDIS_PORT: '6060',
+        GITHUB_TOKEN: 'ghp_token',
+        TRIGGER_SECRET: '7fd4cae3-9c88-4894-9121-115640a2d072',
+      }
+
+      Object.entries(mockEnvVars).forEach(([key, value]) => {
+        process.env[key] = value
+      })
+
+      delete process.env.REDIS_PASSWORD
+
+      const config = createSharedConfig()
+
+      expect(config.redis.password).toBeUndefined()
+    })
+
+    it('should throw error when required environment variables are missing', () => {
+      process.env = {}
+
+      expect(() => createSharedConfig()).toThrow(
+        'Configuration validation failed:',
+      )
     })
   })
 })
