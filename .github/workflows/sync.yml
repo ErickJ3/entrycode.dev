@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: Trigger sync endpoint
         run: |
-          curl -X POST \
+          curl -X GET \
             -H "x-api-key: ${{ secrets.API_KEY }}" \
             -H "Content-Type: application/json" \
             ${{ secrets.API_BASE_URL }}/trigger/sync
